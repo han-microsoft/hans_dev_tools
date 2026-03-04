@@ -1,0 +1,33 @@
+# Search manifest for sample-ops scenario
+# Deploys AI Search indexes for knowledge retrieval (RAG)
+#
+# Usage:
+#   cd ai_search_indexer/scripts
+#   python3 deploy_scenario.py --manifest ../sample_scenario/search_manifest.yaml --dry-run
+#   python3 deploy_scenario.py --manifest ../sample_scenario/search_manifest.yaml --upload-files
+
+scenario:
+  name: "sample-ops"
+  data_root: "sample_scenario"
+
+indexes:
+  - name: "sample-ops-runbooks-index"
+    source: "data/knowledge/runbooks"
+    file_types: ["*.md"]
+    blob_container: "sample-ops-runbooks"
+    description: "Operational runbooks and standard procedures"
+
+  - name: "sample-ops-tickets-index"
+    source: "data/knowledge/tickets"
+    file_types: ["*.txt"]
+    blob_container: "sample-ops-tickets"
+    description: "Historical incident tickets and post-mortems"
+
+  - name: "sample-ops-equipment-index"
+    source: "data/knowledge/equipment"
+    file_types: ["*.md"]
+    blob_container: "sample-ops-equipment"
+    description: "Equipment manifests and specifications"
+
+# Search endpoint comes from env var AI_SEARCH_NAME
+# Auth: DefaultAzureCredential (az login locally, managed identity deployed)

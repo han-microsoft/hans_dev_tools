@@ -1,0 +1,21 @@
+Incident: INC-2025-11-14-0042
+Severity: P2
+Title: API gateway returning 502 errors for /api/orders endpoint
+Reported by: monitoring-bot
+Assigned to: Sarah Chen (L2 Support)
+
+Timeline:
+  2025-11-14 08:32 UTC - Alert fired: 502 error rate > 5% on /api/orders
+  2025-11-14 08:35 UTC - On-call acknowledged, began investigation
+  2025-11-14 08:38 UTC - Root cause: orders-service pod OOMKilled (memory limit 512Mi exceeded)
+  2025-11-14 08:42 UTC - Temporary fix: increased memory limit to 1Gi, restarted pods
+  2025-11-14 08:45 UTC - Error rate returned to 0%, monitoring for recurrence
+  2025-11-14 09:30 UTC - Confirmed stable. Opened follow-up to investigate memory leak.
+
+Root cause: Memory leak in orders-service v2.4.1 caused by unclosed database connections in the batch export feature. Each export request leaked ~2MB.
+
+Resolution: Increased pod memory limit as immediate fix. Permanent fix in v2.4.2 (PR #1847) added connection pooling with proper cleanup.
+
+Affected services: orders-service, api-gateway (upstream 502s)
+Duration: 13 minutes
+Customer impact: ~200 failed order submissions during the window

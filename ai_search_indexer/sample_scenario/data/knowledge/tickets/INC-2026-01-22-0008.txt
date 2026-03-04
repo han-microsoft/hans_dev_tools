@@ -1,0 +1,20 @@
+Incident: INC-2026-01-22-0008
+Severity: P3
+Title: Slow dashboard load times — Redis cache miss rate elevated
+Reported by: Alice Wong (Product Team)
+Assigned to: DevOps On-Call
+
+Timeline:
+  2026-01-22 14:00 UTC - Product team reported dashboard loading in 8-12 seconds (normal: < 2s)
+  2026-01-22 14:15 UTC - Investigation: Redis cache hit rate dropped from 94% to 23%
+  2026-01-22 14:20 UTC - Root cause: Redis instance restarted during Azure maintenance window at 13:45 UTC. Cache was warm but eviction policy (volatile-lru) purged dashboard aggregation keys.
+  2026-01-22 14:30 UTC - Fix: Ran cache warming script for top 50 dashboard queries
+  2026-01-22 14:45 UTC - Dashboard load times back to normal (< 2s)
+
+Root cause: Azure Cache for Redis underwent planned maintenance (patch update). The restart cleared in-memory data. The eviction policy prioritized keeping session keys over analytics cache keys.
+
+Resolution: Ran manual cache warming. Long-term: switched analytics keys to use `allkeys-lru` eviction policy and added a post-restart cache warming job triggered by Azure Service Health webhook.
+
+Affected services: analytics-dashboard
+Duration: ~1 hour (degraded, not down)
+Customer impact: Slow dashboard for internal users. No external customer impact.

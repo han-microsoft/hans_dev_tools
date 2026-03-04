@@ -1,0 +1,27 @@
+Incident: INC-2025-12-03-0019
+Severity: P1
+Title: Complete outage — primary database unreachable
+Reported by: monitoring-bot
+Assigned to: James Park (DBA On-Call)
+
+Timeline:
+  2025-12-03 03:14 UTC - Alert: database connection pool exhausted across all services
+  2025-12-03 03:16 UTC - DBA on-call acknowledged. All services reporting connection timeouts.
+  2025-12-03 03:18 UTC - Investigation: primary PostgreSQL host not responding to pg_isready
+  2025-12-03 03:20 UTC - Host SSH accessible. PostgreSQL process consuming 100% CPU.
+  2025-12-03 03:22 UTC - Identified: runaway VACUUM FULL on 40GB table (launched by overnight maintenance job)
+  2025-12-03 03:24 UTC - Killed VACUUM process. Database recovered within 30 seconds.
+  2025-12-03 03:26 UTC - Services reconnecting. All health checks passing by 03:28.
+  2025-12-03 03:45 UTC - Confirmed stable across all services.
+
+Root cause: Automated maintenance job launched VACUUM FULL on the events table (40GB) without the --analyze-only flag. VACUUM FULL takes an exclusive lock and rewrites the entire table, blocking all queries.
+
+Resolution: Killed the VACUUM process. Updated maintenance script to use VACUUM ANALYZE (no exclusive lock). Added pg_stat_activity monitoring for long-running maintenance queries.
+
+Affected services: All (database is shared dependency)
+Duration: 14 minutes
+Customer impact: Complete service outage. ~3,200 failed requests during window.
+Post-mortem action items:
+  1. Replace VACUUM FULL with VACUUM ANALYZE in all maintenance scripts
+  2. Add circuit breaker: kill maintenance queries running > 5 minutes
+  3. Schedule maintenance during lowest-traffic window (Tuesday 04:00 UTC)

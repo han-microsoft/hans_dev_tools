@@ -65,6 +65,32 @@ python3 deploy_scenario.py --manifest ../sample_scenario/deploy_manifest.yaml
 
 ---
 
+### 4. `ai_search_indexer/` — Azure AI Search Index Deployer
+
+Manifest-driven deployment of Azure AI Search indexes with vector search and semantic ranking. One command to:
+
+1. Upload knowledge docs (markdown, text) to Azure Blob Storage
+2. Create search indexes with HNSW vector search + Azure OpenAI vectorizer
+3. Build chunking + embedding skillsets (SplitSkill → AzureOpenAIEmbeddingSkill)
+4. Run indexers and poll until complete
+
+Pre-flight checks auto-fix common issues (storage public access, Search RBAC, missing containers).
+
+Includes a **sample ops scenario** with dummy runbooks, incident tickets, and equipment manifests.
+
+```bash
+cd ai_search_indexer/scripts
+cp ../.env.example ../azure_config.env   # Edit with your Azure resource names
+az login
+python3 deploy_scenario.py --manifest ../sample_scenario/search_manifest.yaml --upload-files
+# Or dry-run (no Azure credentials needed):
+python3 deploy_scenario.py --manifest ../sample_scenario/search_manifest.yaml --dry-run
+```
+
+[Full docs →](ai_search_indexer/README.md)
+
+---
+
 ## How to Vibecode Your Own App
 
 ### Chat app with tool use
@@ -102,3 +128,10 @@ Copy the backend you want from `graph_viz/src/`:
 - React Flow: `ReactFlow/` folder + `hooks/useTopology.ts` + `constants.ts`
 
 Replace the fetch URL in `useTopology.ts` to point at your API.
+
+### RAG-powered chat with AI Search
+
+1. Use `ai_search_indexer/` to index your knowledge docs (runbooks, policies, specs — anything markdown or text)
+2. Copy `streaming_chat_ui/` for the chat interface
+3. Wire your agent's tools to query the search indexes (hybrid search: keyword + vector + semantic reranking)
+4. The search indexes chunk, embed, and serve your docs — no custom embedding pipeline needed
