@@ -1,0 +1,19 @@
+# Scenario configuration — defines data sources and their telemetry containers
+# The deploy scripts use this to build KQL table schemas in the Eventhouse
+
+scenario_name: sample-bookstore
+display_name: Sample Bookstore
+description: A simple bookstore knowledge graph for demonstration purposes.
+
+data_sources:
+  telemetry:
+    config:
+      containers:
+        - name: BookEvents
+          csv_file: BookEvents.csv
+          numeric_fields:
+            - Duration_sec
+        - name: BookReviews
+          csv_file: BookReviews.csv
+          numeric_fields:
+            - Rating

@@ -1,0 +1,11 @@
+BookId,Title,Genre,PublishedYear,Rating
+B001,Pride and Prejudice,Romance,1813,4.7
+B002,Sense and Sensibility,Romance,1811,4.3
+B003,Adventures of Huckleberry Finn,Adventure,1884,4.5
+B004,The Adventures of Tom Sawyer,Adventure,1876,4.2
+B005,One Hundred Years of Solitude,Magical Realism,1967,4.8
+B006,Love in the Time of Cholera,Romance,1985,4.4
+B007,Norwegian Wood,Literary Fiction,1987,4.1
+B008,Kafka on the Shore,Magical Realism,2002,4.3
+B009,Half of a Yellow Sun,Historical Fiction,2006,4.6
+B010,Americanah,Literary Fiction,2013,4.5

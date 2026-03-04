@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Variables (dark theme) ──────────────────────────────────────── */
+:root {
+  --color-brand: #6366f1;
+  --color-brand-hover: #818cf8;
+  --color-bg-1: #0f1117;
+  --color-bg-2: #1a1d27;
+  --color-bg-3: #252836;
+  --color-bg-4: #2f3344;
+  --color-text-primary: #e4e5eb;
+  --color-text-secondary: #a1a3b0;
+  --color-text-muted: #6b6e7d;
+  --color-border: #2f3344;
+  --color-status-success: #22c55e;
+  --color-status-error: #ef4444;
+  --color-status-warning: #f59e0b;
+}
+
+/* ── Base styles ─────────────────────────────────────────────────────── */
+body {
+  margin: 0;
+  background-color: var(--color-bg-1);
+  color: var(--color-text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Scrollbar styling ───────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}

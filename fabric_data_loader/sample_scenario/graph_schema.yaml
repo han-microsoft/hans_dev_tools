@@ -1,0 +1,61 @@
+# Graph Schema — defines the knowledge graph ontology
+# Each vertex type maps to a CSV file in data/entities/
+# Each edge type maps to a CSV file in data/entities/
+# The deployment scripts use this to create the Fabric ontology
+
+vertices:
+  - label: Author
+    csv_file: Authors.csv
+    properties:
+      - name: AuthorId
+        type: string
+        key: true
+      - name: Name
+        type: string
+      - name: Country
+        type: string
+      - name: BirthYear
+        type: int
+
+  - label: Book
+    csv_file: Books.csv
+    properties:
+      - name: BookId
+        type: string
+        key: true
+      - name: Title
+        type: string
+      - name: Genre
+        type: string
+      - name: PublishedYear
+        type: int
+      - name: Rating
+        type: float
+
+  - label: Publisher
+    csv_file: Publishers.csv
+    properties:
+      - name: PublisherId
+        type: string
+        key: true
+      - name: Name
+        type: string
+      - name: City
+        type: string
+
+edges:
+  - label: WROTE
+    csv_file: Wrote.csv
+    source: Author
+    target: Book
+    properties:
+      - name: Year
+        type: int
+
+  - label: PUBLISHED_BY
+    csv_file: PublishedBy.csv
+    source: Book
+    target: Publisher
+    properties:
+      - name: ContractYear
+        type: int

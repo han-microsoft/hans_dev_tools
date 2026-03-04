@@ -1,0 +1,25 @@
+# Deploy manifest for sample-bookstore scenario
+# Copy this file and edit for your own scenario
+
+target:
+  tenant_id: ""                          # Your Azure tenant ID
+  workspace_name: "MyGraphWorkspace"     # Fabric workspace display name
+  # workspace_id: ""                     # Or use existing workspace ID
+  # capacity_id: ""                      # Fabric capacity ID (from Bicep/portal)
+  # folder_path: "GraphData/bookstore"   # Optional: workspace folder tree
+
+scenario:
+  name: "sample-bookstore"
+  data_root: "sample_scenario"
+
+resources:
+  lakehouse:
+    name: "LH_Bookstore"
+  eventhouse:
+    name: "EH_Bookstore"
+  ontology:
+    name: "ONT_Bookstore"
+    schema: "graph_schema.yaml"
+
+output:
+  env_file: "azure_config.env"

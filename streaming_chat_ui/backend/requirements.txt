@@ -1,0 +1,16 @@
+# Streaming Chat UI — Backend Dependencies
+#
+# Core
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+sse-starlette>=2.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+tiktoken>=0.7.0
+
+# LLM Providers (install as needed)
+# OpenAI / Azure OpenAI:
+openai>=1.50.0
+# Azure AI Foundry Agent:
+# azure-ai-projects>=1.0.0b5
+# azure-identity>=1.17.0

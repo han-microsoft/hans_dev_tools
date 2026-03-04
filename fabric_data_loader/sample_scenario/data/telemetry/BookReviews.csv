@@ -1,0 +1,9 @@
+Timestamp,BookId,Rating,ReviewText,UserId
+2025-01-10T09:00:00Z,B001,5,A timeless classic that never gets old,U200
+2025-01-11T14:30:00Z,B005,5,Masterpiece of magical realism,U201
+2025-01-12T18:00:00Z,B007,4,Beautiful and melancholic,U202
+2025-01-13T10:15:00Z,B009,5,Powerful and deeply moving,U203
+2025-01-14T20:00:00Z,B003,4,Great adventure story,U204
+2025-01-15T08:00:00Z,B010,5,Important and beautifully written,U205
+2025-01-15T12:30:00Z,B008,4,Surreal and captivating,U206
+2025-01-16T16:00:00Z,B006,4,Romantic and deeply human,U207

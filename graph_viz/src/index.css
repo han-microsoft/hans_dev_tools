@@ -1,0 +1,131 @@
+/*
+ * Global styles — Tailwind base + CSS custom properties for theming.
+ *
+ * Defines the design system's colour tokens as CSS custom properties.
+ * Both light (:root) and dark (.dark) themes are declared here.
+ * Tailwind utility classes reference these tokens via theme.extend.colors.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+
+  /* Brand */
+  --color-brand: #117865;
+  --color-brand-hover: #0E6658;
+  --color-brand-light: #1A9C85;
+  --color-brand-subtle: rgba(17, 120, 101, 0.08);
+
+  /* Backgrounds */
+  --color-bg-1: #FFFFFF;
+  --color-bg-2: #FAF9F8;
+  --color-bg-3: #F3F2F1;
+  --color-bg-4: #EDEBE9;
+  --color-bg-5: #E1DFDD;
+  --color-bg-6: #D2D0CE;
+
+  /* Text */
+  --color-text-primary: #242424;
+  --color-text-secondary: #616161;
+  --color-text-muted: #A19F9D;
+  --color-text-tertiary: #C8C6C4;
+
+  /* Borders */
+  --color-border-subtle: #F0F0F0;
+  --color-border-default: #E0E0E0;
+  --color-border-strong: #D1D1D1;
+
+  /* Status */
+  --color-success: #107C10;
+  --color-warning: #FFB900;
+  --color-error: #D13438;
+  --color-info: #0078D4;
+}
+
+/* ── Dark theme ─────────────────────────────────────────────────── */
+.dark {
+  color-scheme: dark;
+
+  --color-brand: #1A9C85;
+  --color-brand-hover: #21B89B;
+  --color-brand-light: #2BD4B3;
+  --color-brand-subtle: rgba(26, 156, 133, 0.12);
+
+  --color-bg-1: #1B1B1B;
+  --color-bg-2: #252525;
+  --color-bg-3: #2E2E2E;
+  --color-bg-4: #383838;
+  --color-bg-5: #444444;
+  --color-bg-6: #525252;
+
+  --color-text-primary: #F0F0F0;
+  --color-text-secondary: #B0B0B0;
+  --color-text-muted: #787878;
+  --color-text-tertiary: #5A5A5A;
+
+  --color-border-subtle: #333333;
+  --color-border-default: #3D3D3D;
+  --color-border-strong: #4A4A4A;
+
+  --color-success: #36B136;
+  --color-warning: #FF8C42;
+  --color-error: #E05C63;
+  --color-info: #4EA8DF;
+}
+
+body {
+  @apply bg-neutral-bg1 text-text-primary font-sans antialiased;
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* Focus styles */
+*:focus-visible {
+  @apply outline-none ring-2 ring-brand ring-offset-2;
+  --tw-ring-offset-color: var(--color-bg-1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-neutral-bg2;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-bg5 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neutral-bg6;
+}
+
+/* ── React Flow edge dash animation ─────────────────────────── */
+@keyframes dash-flow {
+  to { stroke-dashoffset: -9; }
+}
+
+/* ── React Flow theme overrides ─────────────────────────────── */
+.react-flow__node {
+  /* Remove default React Flow node shadow/border. */
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.react-flow__handle {
+  /* Invisible connection handles — edges still connect properly. */
+  opacity: 0;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+.react-flow__minimap {
+  border-radius: 8px;
+  overflow: hidden;
+}
