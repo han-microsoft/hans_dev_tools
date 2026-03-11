@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundry Agent — Context Demo</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, 'Segey UI', sans-serif;
+    background: #0f172a; color: #e2e8f0;
+    height: 100vh; display: flex; flex-direction: column;
+  }
+
+  /* ── Header ─────────────────────────────────────────────── */
+  header {
+    background: #1e293b; padding: 12px 20px;
+    border-bottom: 1px solid #334155;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  header h1 { font-size: 16px; font-weight: 600; color: #38bdf8; }
+  .badge {
+    font-size: 12px; background: #164e63; color: #67e8f9;
+    padding: 2px 10px; border-radius: 12px;
+  }
+
+  /* ── Chat ────────────────────────────────────────────────── */
+  #chat {
+    flex: 1; overflow-y: auto; padding: 20px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  .msg {
+    max-width: 80%; padding: 10px 16px; border-radius: 12px;
+    line-height: 1.6; font-size: 14px;
+    white-space: pre-wrap; word-wrap: break-word;
+  }
+  .msg.user {
+    align-self: flex-end; background: #1d4ed8; color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.assistant {
+    align-self: flex-start; background: #1e293b;
+    border: 1px solid #334155; border-bottom-left-radius: 4px;
+  }
+
+  /* Thinking indicator */
+  .msg.thinking {
+    align-self: flex-start; background: #1e293b;
+    border: 1px solid #334155; border-bottom-left-radius: 4px;
+    color: #64748b; font-style: italic;
+  }
+  .msg.thinking .dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+  @keyframes dots {
+    0%   { content: ''; }
+    25%  { content: '.'; }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+    100% { content: ''; }
+  }
+
+  /* ── Input ───────────────────────────────────────────────── */
+  #input-area {
+    background: #1e293b; padding: 12px 20px;
+    border-top: 1px solid #334155;
+    display: flex; gap: 8px;
+  }
+  #input-area input {
+    flex: 1; background: #0f172a; border: 1px solid #334155;
+    color: #e2e8f0; padding: 10px 14px; border-radius: 8px;
+    font-size: 14px; outline: none;
+  }
+  #input-area input:focus { border-color: #38bdf8; }
+  #input-area button {
+    background: #2563eb; color: #fff; border: none;
+    padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer;
+  }
+  #input-area button:hover { background: #1d4ed8; }
+  #input-area button:disabled { opacity: .5; cursor: default; }
+
+  /* ── Status bar ──────────────────────────────────────────── */
+  #ctx-info {
+    font-size: 11px; color: #64748b; padding: 4px 20px;
+    background: #1e293b; text-align: right;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Foundry Agent — Custom Context Demo</h1>
+  <span class="badge" id="badge">Loading...</span>
+</header>
+
+<div id="chat"></div>
+
+<div id="ctx-info">Connecting...</div>
+
+<div id="input-area">
+  <input id="msg" placeholder="Type a message..." autocomplete="off" autofocus>
+  <button id="send">Send</button>
+</div>
+
+<script>
+// ── Config (fetched from backend) ──────────────────────────
+let MAX_CTX = 10;
+let msgCount = 0;
+
+const chat  = document.getElementById('chat');
+const input = document.getElementById('msg');
+const btn   = document.getElementById('send');
+
+// Fetch config from backend
+fetch('/config').then(r => r.json()).then(cfg => {
+  MAX_CTX = cfg.max_context_messages || 10;
+  document.getElementById('badge').textContent = `Last ${MAX_CTX} messages`;
+  document.getElementById('ctx-info').textContent =
+    `Context window: ${MAX_CTX} messages | 0 in history`;
+}).catch(() => {
+  document.getElementById('badge').textContent = `Last ${MAX_CTX} messages`;
+  document.getElementById('ctx-info').textContent = 'Config unavailable';
+});
+
+// ── Event listeners ────────────────────────────────────────
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !btn.disabled) sendMessage();
+});
+btn.addEventListener('click', sendMessage);
+
+// ── Helpers ────────────────────────────────────────────────
+function addMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.textContent = text || '';
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function scrollToBottom() {
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// ── Send message ───────────────────────────────────────────
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  btn.disabled = true;
+
+  // Show user message
+  addMsg('user', text);
+  msgCount++;
+
+  // Show thinking indicator
+  const thinkEl = addMsg('thinking', 'Thinking');
+  const dotsSpan = document.createElement('span');
+  dotsSpan.className = 'dots';
+  thinkEl.appendChild(dotsSpan);
+
+  try {
+    const res = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      thinkEl.remove();
+      addMsg('assistant', `Error: ${res.status} — ${err}`);
+      btn.disabled = false;
+      input.focus();
+      return;
+    }
+
+    // Remove thinking indicator, create assistant bubble
+    thinkEl.remove();
+    const el = addMsg('assistant', '');
+
+    // Stream response via SSE
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6);
+        if (data === '[DONE]') continue;
+        fullText += data;
+        el.textContent = fullText;
+        scrollToBottom();
+      }
+    }
+
+    if (!fullText) {
+      el.textContent = '[No response from agent]';
+    }
+    msgCount++;
+
+  } catch (err) {
+    thinkEl.remove();
+    addMsg('assistant', 'Error: ' + err.message);
+  }
+
+  btn.disabled = false;
+  input.focus();
+
+  const injected = Math.min(Math.max(0, msgCount - 1), MAX_CTX);
+  document.getElementById('ctx-info').textContent =
+    `Context window: ${MAX_CTX} messages | ${msgCount} in history | ${injected} injected`;
+}
+</script>
+</body>
+</html>
